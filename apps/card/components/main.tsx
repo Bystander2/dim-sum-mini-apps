@@ -49,13 +49,13 @@ export default function Main() {
       }
       try {
         const response = await fetch(
-          `https://backend.aidimsum.com/corpus_item?unique_id=${uniqueId}`
+          `https://backend.aidimsum.com/v2/corpus_item?unique_id=${uniqueId}`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
         const data = await response.json();
-        setItem(data[0]);
+        setItem(data);
       } catch (error) {
         console.error("Error fetching data:", error);
         // toast.error("Failed to fetch data");
