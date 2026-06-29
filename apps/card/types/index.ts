@@ -22,23 +22,51 @@ export interface DictionaryNote {
 
 export type Note = DictionaryNote;
 
+interface StructuredNoteBlock {
+  type?: string;
+  content?: string;
+  jyutping?: string;
+  jytping?: string;
+}
+
+interface StructuredNoteDataItem {
+  blocks?: StructuredNoteBlock[];
+  jyutping?: string;
+  jytping?: string;
+}
+
+export interface StructuredNote {
+  data?: StructuredNoteDataItem[];
+}
+
 export interface CorpusItem {
   id: string;
   unique_id: string;
   data: string;
   category: string;
   note: Note;
+  structured_note?: StructuredNote;
   tags: string[];
 }
+
+export interface CorpusCategory {
+  id?: string;
+  name?: string;
+  nickname?: string;
+  tags?: string[];
+  [key: string]: unknown;
+}
+
+export type CardMode = "light" | "dark";
 
 export interface CardContentItem {
   cardRef?: RefObject<HTMLDivElement | null>;
   scale?: string;
   isQrcode: boolean;
-  bg: string;
-  fontColor: string;
   fontFamily: string;
+  mode: CardMode;
   transformTCOrSp: (str: string, isTraditional: boolean) => string;
   traditional: boolean;
   item: CorpusItem;
+  category: CorpusCategory | null;
 }
