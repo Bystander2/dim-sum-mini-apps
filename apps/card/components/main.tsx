@@ -5,6 +5,86 @@ import { useSearchParams } from "next/navigation";
 import YueCard from "@/components/card";
 import { CardMode, CorpusCategory, CorpusItem } from "../types";
 
+const backendBaseUrl = (
+  process.env.NEXT_PUBLIC_BACKEND_BASE_URL || "https://backend.aidimsum.com"
+).replace(/\/$/, "");
+const backendApiUrl = (
+  process.env.NEXT_PUBLIC_BACKEND_API_URL || backendBaseUrl
+).replace(/\/$/, "");
+
+type EntryTag = {
+  id: number;
+  slug: string;
+  name: string;
+};
+
+type EntryCategory = {
+  id: number;
+  slug: string;
+  name: string;
+};
+
+type EntryDetail = {
+  corpusId: number;
+  entryId: string;
+  entryName: string;
+  jyutping: string | null;
+  meaning: string | null;
+  source: {
+    categoryName: string;
+    categoryDisplayName: string | null;
+    contributorIds: string[];
+  };
+  category: {
+    primary: EntryCategory | null;
+    secondary: EntryCategory | null;
+  };
+  tags: {
+    precise: EntryTag[];
+    related: EntryTag[];
+    recommended: EntryTag[];
+  };
+};
+
+type EntryDetailResponse = {
+  entry: EntryDetail;
+};
+
+function mapEntryToCardData(entry: EntryDetail): {
+  item: CorpusItem;
+  category: CorpusCategory;
+} {
+  const categoryTags = [
+    entry.category.primary?.name,
+    entry.category.secondary?.name,
+  ].filter((tag): tag is string => Boolean(tag));
+
+  return {
+    item: {
+      id: String(entry.corpusId),
+      unique_id: entry.entryId,
+      data: entry.entryName,
+      category: entry.source.categoryName,
+      note: {
+        context: {
+          ...(entry.jyutping ? { pinyin: [entry.jyutping] } : {}),
+          ...(entry.meaning ? { meaning: [entry.meaning] } : {}),
+        },
+        contributor: entry.source.contributorIds.join(", "),
+      },
+      tags: [],
+      related_tags: entry.tags.related.map((tag) => tag.name),
+      recommended_tags: entry.tags.recommended.map((tag) => tag.name),
+    },
+    category: {
+      id: entry.source.categoryName,
+      name: entry.source.categoryName,
+      nickname: entry.source.categoryDisplayName || entry.source.categoryName,
+      tags: categoryTags,
+    },
+  };
+}
+
 // Create a client component for the main content
 export default function Main() {
   const searchParams = useSearchParams();
@@ -36,7 +116,7 @@ export default function Main() {
 
     async function fetchRandomItem() {
       const response = await fetch(
-        "https://backend.aidimsum.com/random_item?corpus_name=zyzdv2",
+        `${backendBaseUrl}/random_item?corpus_name=zyzdv2`,
       );
 
       if (!response.ok) {
@@ -49,7 +129,7 @@ export default function Main() {
 
     async function fetchCorpusCategory(category: string) {
       const response = await fetch(
-        `https://backend.aidimsum.com/v2/corpus_category?name=${encodeURIComponent(
+        `${backendBaseUrl}/v2/corpus_category?name=${encodeURIComponent(
           category,
         )}`,
       );
@@ -82,26 +162,22 @@ export default function Main() {
       setCategory(null);
 
       const hasUrlItemParams =
-        data ||
-        pinyin ||
-        meaning ||
-        contributor ||
-        author ||
-        lyric ||
-        pron;
+        data || pinyin || meaning || contributor || author || lyric || pron;
 
       try {
         if (uniqueId) {
           const response = await fetch(
-            `https://backend.aidimsum.com/v2/corpus_item?unique_id=${uniqueId}`,
+            `${backendApiUrl}/api/entries/${encodeURIComponent(uniqueId)}`,
           );
 
           if (!response.ok) {
             throw new Error("Failed to fetch data");
           }
 
-          const data = await response.json();
-          await setItemWithCategory(data);
+          const data = (await response.json()) as EntryDetailResponse;
+          const cardData = mapEntryToCardData(data.entry);
+          setItem(cardData.item);
+          setCategory(cardData.category);
           return;
         }
 

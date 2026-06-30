@@ -47,6 +47,8 @@ export interface CorpusItem {
   note: Note;
   structured_note?: StructuredNote;
   tags: string[];
+  related_tags?: string[];
+  recommended_tags?: string[];
 }
 
 export interface CorpusCategory {

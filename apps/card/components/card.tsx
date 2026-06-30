@@ -26,8 +26,8 @@ const YueCard = ({
       : "border-[#d1d5db] bg-[#d8dadd] data-[state=checked]:bg-[#d8dadd] data-[state=unchecked]:bg-[#d8dadd] shadow-[0_2px_10px_rgba(15,23,42,0.18)]";
   const switchThumbClass =
     mode === "dark"
-      ? "bg-[#07111f] data-[state=checked]:translate-x-[24px] data-[state=unchecked]:translate-x-0"
-      : "bg-white data-[state=checked]:translate-x-[24px] data-[state=unchecked]:translate-x-0";
+      ? "bg-[#07111f] data-[state=checked]:translate-x-[20px] data-[state=unchecked]:translate-x-0"
+      : "bg-white data-[state=checked]:translate-x-[20px] data-[state=unchecked]:translate-x-0";
   const switchTextClass = mode === "dark" ? "text-white" : "text-[#6b7280]";
   const fontFamily = searchParams.get("fontFamily") || "Noto Sans SC";
   const [traditional, setTranditional] = useState(
@@ -47,8 +47,8 @@ const YueCard = ({
             onCheckedChange={(value) => setTranditional(value)}
           >
             <span
-              className={`pointer-events-none absolute z-0 text-xs font-bold leading-none ${switchTextClass} ${
-                traditional ? "left-2.5" : "right-1.5"
+              className={`pointer-events-none absolute z-0 w-3.5 text-center text-xs font-bold leading-none ${switchTextClass} ${
+                traditional ? "left-2" : "right-2"
               }`}
             >
               {traditional ? "繁" : "简"}

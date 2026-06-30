@@ -144,16 +144,40 @@ export default function CardContent({
           )}
 
           {/* 关键标签 */}
-          {item.tags.length > 0 && (
+          {(item.tags.length > 0 || (item.related_tags?.length ?? 0) > 0) && (
             <div className="flex items-start gap-2 leading-relaxed">
               <b className="shrink-0">
                 {transformTCOrSp("关键标签", traditional)}：
               </b>
               <div className="flex flex-wrap gap-2">
-                {item.tags.map((tag) => (
+                {(item.tags.length > 0
+                  ? item.tags
+                  : item.related_tags?.length
+                    ? item.related_tags
+                    : []
+                ).map((tag) => (
                   <span
                     key={tag}
                     className="inline-flex items-center rounded-md border border-[var(--ds-primary)] bg-[var(--ds-tag-background)] px-2 py-0.5 text-[0.95em] font-semibold leading-tight text-[var(--ds-tag-foreground)]"
+                  >
+                    {transformTCOrSp(tag, traditional)}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 推荐标签 */}
+          {(item.recommended_tags?.length ?? 0) > 0 && (
+            <div className="flex items-start gap-2 leading-relaxed">
+              <b className="shrink-0">
+                {transformTCOrSp("推荐标签", traditional)}：
+              </b>
+              <div className="flex flex-wrap gap-x-2 gap-y-2">
+                {(item.recommended_tags ?? []).map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center rounded-md border border-[#cfd3d7] bg-[#f1f3f5] px-2 py-0.5 text-[0.95em] font-semibold leading-tight text-[#7a7f85] shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] dark:border-[#2c333d] dark:bg-[#20252c] dark:text-[#b8bdc4] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
                   >
                     {transformTCOrSp(tag, traditional)}
                   </span>
